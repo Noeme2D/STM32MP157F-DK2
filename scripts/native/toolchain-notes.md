@@ -74,6 +74,6 @@ bitbake -f <recipe>
 sudo ckermit kermit_ttyACM0.cfg -s <file>
 
 # Open serial console through st-link port
-# ctrl-A X to quit
+# ctrl-A ctrl-X to quit
 picocom -b 115200 /dev/ttyACM0
 ```
