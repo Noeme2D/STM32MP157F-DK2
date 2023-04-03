@@ -18,5 +18,5 @@ LDFLAGS_ADDONS += $(shell pkg-config --libs gbm)
 CFLAGS_ADDONS += $(shell pkg-config --cflags egl)
 LDFLAGS_ADDONS += $(shell pkg-config --libs egl)
 
-ls-gl-ext: ${SRC_DIR}/ls-gl-ext.c
+ls-gl-ext: ${SRC_DIR}/ls-gl-ext.c ${SRC_DIR}/graphics-common.c
 	$(CC) $^ $(CFLAGS_ADDONS) $(LDFLAGS_ADDONS) -o $@
