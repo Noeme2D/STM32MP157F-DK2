@@ -1,7 +1,9 @@
 #include "graphics-common.h"
 
 #include "drm_fourcc.h"
+#include <EGL/egl.h>
 #include <EGL/eglext.h>
+#include <EGL/eglplatform.h>
 #include <fcntl.h>
 #include <gbm.h>
 #include <stdio.h>
@@ -106,14 +108,20 @@ int init_gl(egl_t *egl, gbm_t *gbm) {
         return -1;
     }
     // EGL_NO_CONTEXT means the context is not created by sharing with others
-    EGLContext context = eglCreateContext(egl->display, egl->config, EGL_NO_CONTEXT, context_attrib);
-    if (context == EGL_NO_CONTEXT) {
+    egl->context = eglCreateContext(egl->display, egl->config, EGL_NO_CONTEXT, context_attrib);
+    if (egl->context == EGL_NO_CONTEXT) {
         printf("eglCreateContext() failed.\n");
         return -1;
     }
 
+    egl->surface = eglCreateWindowSurface(egl->display, egl->config, (EGLNativeWindowType)gbm->surface, NULL);
+    if (egl->surface == EGL_NO_SURFACE) {
+        printf("eglCreateWindowSurface() failed.\n");
+        return -1;
+    }
+
     // enable the OpenGL ES 2.0 context just set up
-    if (eglMakeCurrent(egl->display, EGL_NO_CONTEXT, EGL_NO_CONTEXT, context) != EGL_TRUE) {
+    if (eglMakeCurrent(egl->display, egl->surface, egl->surface, egl->context) != EGL_TRUE) {
         printf("eglMakeCurrent() failed with error code %x\n", eglGetError());
         return -1;
     }

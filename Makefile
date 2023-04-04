@@ -20,3 +20,6 @@ LDFLAGS_ADDONS += $(shell pkg-config --libs egl)
 
 ls-gl-ext: ${SRC_DIR}/ls-gl-ext.c ${SRC_DIR}/graphics-common.c
 	$(CC) $^ $(CFLAGS_ADDONS) $(LDFLAGS_ADDONS) -o $@
+
+gl-test: ${SRC_DIR}/gl-test.c ${SRC_DIR}/graphics-common.c
+	$(CC) $^ $(CFLAGS_ADDONS) $(LDFLAGS_ADDONS) -o $@

@@ -7,6 +7,7 @@
 typedef struct {
     EGLDisplay display;
     EGLConfig config;
+    EGLSurface surface;
     EGLContext context;
 } egl_t;
 

@@ -77,3 +77,19 @@ sudo ckermit kermit_ttyACM0.cfg -s <file>
 # ctrl-A ctrl-X to quit
 picocom -b 115200 /dev/ttyACM0
 ```
+
+#### cross-debugging:
+
+```
+sudo ckermit kermit_ttyACM0.cfg -g /var/lib/systemd/coredump/<core-file>
+# decompress and set permission
+```
+
+(inside SDK/)
+```
+source environment-setup-cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi
+$GDB
+  set sysroot sysroots/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi
+  file <executable>
+  core-file <core-file>
+```
