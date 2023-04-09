@@ -1,25 +1,24 @@
-INC_DIR=inc
-SRC_DIR=src
-
 CFLAGS_ADDONS = $(CFLAGS)
 LDFLAGS_ADDONS = $(LDFLAGS)
 
-CFLAGS_ADDONS += -I$(INC_DIR)/
+ls-gl-ext: deps = libdrm glesv2 gbm egl
 
-CFLAGS_ADDONS += $(shell pkg-config --cflags libdrm)
-LDFLAGS_ADDONS += $(shell pkg-config --libs libdrm)
-
-CFLAGS_ADDONS += $(shell pkg-config --cflags glesv2)
-LDFLAGS_ADDONS += $(shell pkg-config --libs glesv2)
-
-CFLAGS_ADDONS += $(shell pkg-config --cflags gbm)
-LDFLAGS_ADDONS += $(shell pkg-config --libs gbm)
-
-CFLAGS_ADDONS += $(shell pkg-config --cflags egl)
-LDFLAGS_ADDONS += $(shell pkg-config --libs egl)
-
-ls-gl-ext: ${SRC_DIR}/ls-gl-ext.c ${SRC_DIR}/graphics-common.c
+ls-gl-ext: src/ls-gl-ext.c src/graphics-common.c
+	$(foreach dep, $(deps), $(eval CFLAGS_ADDONS += $(shell pkg-config --cflags $(dep))))
+	$(foreach dep, $(deps), $(eval LDFLAGS_ADDONS += $(shell pkg-config --libs $(dep))))
+	$(eval CFLAGS_ADDONS += -Iinc/)
 	$(CC) $^ $(CFLAGS_ADDONS) $(LDFLAGS_ADDONS) -o $@
 
-gl-test: ${SRC_DIR}/gl-test.c ${SRC_DIR}/graphics-common.c
+clean-ls-gl-ext:
+	rm -f ls-gl-ext
+
+gl-test: deps = libdrm glesv2 gbm egl
+
+gl-test: src/gl-test.c src/graphics-common.c
+	$(foreach dep, $(deps), $(eval CFLAGS_ADDONS += $(shell pkg-config --cflags $(dep))))
+	$(foreach dep, $(deps), $(eval LDFLAGS_ADDONS += $(shell pkg-config --libs $(dep))))
+	$(eval CFLAGS_ADDONS += -Iinc/)
 	$(CC) $^ $(CFLAGS_ADDONS) $(LDFLAGS_ADDONS) -o $@
+
+clean-gl-test:
+	rm -f gl-test
