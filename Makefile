@@ -22,3 +22,20 @@ gl-test: src/gl-test.c src/graphics-common.c
 
 clean-gl-test:
 	rm -f gl-test
+
+c-py-test: cpytest.c src/c-py-test.c
+	$(eval CFLAGS_ADDONS += $(shell pkg-config --cflags python3))
+#	dirty to hard encode 3.10, but I don't know better ways...
+	$(eval LDFLAGS_ADDONS += -lpython3.10)
+	$(eval CFLAGS_ADDONS += -I$(Python_NumPy_INCLUDE_DIR))
+	$(eval CFLAGS_ADDONS += -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
+	$(eval CFLAGS_ADDONS += -Iinc/)
+	$(CC) $(CFLAGS_ADDONS) $^ $(LDFLAGS_ADDONS) -o c-py-test 
+
+cpytest.c: src/cpytest.pyx
+	mv $< .
+	/usr/bin/cython -X language_level=3 -X wraparound=False -X boundscheck=False -X cdivision=True cpytest.pyx
+	mv cpytest.pyx src/
+
+clean-c-py-test:
+	rm -f cpytest.c cpytest.h c-py-test
