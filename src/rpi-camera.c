@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/poll.h>
 #include <unistd.h>
 
 #define WIDTH 640
@@ -141,13 +142,10 @@ int capture_image(int fd) {
         return -1;
     }
 
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
-    struct timeval tv = {0};
-    tv.tv_sec = 2;
-    int r = select(fd + 1, &fds, NULL, NULL, &tv);
-    if (-1 == r) {
+    struct pollfd pfd;
+    pfd.fd = fd;
+    pfd.events = POLLIN;
+    if (poll(&pfd, 1, 2000) == -1) {
         perror("Waiting for Frame");
         return -1;
     }
