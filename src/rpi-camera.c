@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <linux/v4l2-controls.h>
 #include <linux/videodev2.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -65,6 +66,33 @@ int set_pix_fmt(int fd, int pix_fmt) {
 
     if (ioctl(fd, VIDIOC_S_FMT, &fmt)) {
         perror("Setting Pixel Format");
+        return -1;
+    }
+
+    return 0;
+}
+
+int set_focus(int fd, int focus) {
+    struct v4l2_ext_controls ctrls = {0};
+    struct v4l2_ext_control ctrl = {0};
+
+    ctrls.which = V4L2_CTRL_WHICH_CUR_VAL;
+    ctrls.count = 1;
+    ctrls.controls = &ctrl;
+    ctrl.id = V4L2_CID_FOCUS_AUTO;
+    ctrl.value = 0;
+    if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls)) {
+        perror("Shutting Down Auto-Focus");
+        return -1;
+    }
+
+    ctrls.which = V4L2_CTRL_WHICH_CUR_VAL;
+    ctrls.count = 1;
+    ctrls.controls = &ctrl;
+    ctrl.id = V4L2_CID_FOCUS_ABSOLUTE;
+    ctrl.value = focus;
+    if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls)) {
+        perror("Setting Focus");
         return -1;
     }
 
@@ -147,6 +175,7 @@ int main(int argc, char *argv[]) {
     }
     if (print_caps(fd)) return -1;
     if (set_pix_fmt(fd, V4L2_PIX_FMT_YUYV)) return -1;
+    if (set_focus(fd, 200)) return -1;
     if (init_mmap(fd)) return -1;
     if (capture_image(fd)) return -1;
 
